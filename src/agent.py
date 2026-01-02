@@ -9,10 +9,10 @@ from livekit.agents import (
     JobProcess,
     WorkerOptions,
     cli,
+    stt
 )
 
 from livekit.plugins import silero, sarvam, openai, elevenlabs
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("agent")
 
@@ -40,14 +40,22 @@ async def entrypoint(ctx: JobContext):
     await ctx.connect()
 
     session = AgentSession(
-        stt=sarvam.STT(model="saarika-v2", language="en-IN"),
+        stt=stt.StreamAdapter(
+            stt=sarvam.STT(
+                model="saarika-v2",
+                language="en-IN",
+            ),
+            vad=ctx.proc.userdata["vad"],
+        ),
+
         llm=openai.LLM(model="gpt-4.1-mini"),
+
         tts=elevenlabs.TTS(
             model="eleven_turbo_v2",
             voice_id="kiaJRdXJzloFWi6AtFBf",
         ),
-        vad=ctx.proc.userdata["vad"],
 
+        # 🔑 REQUIRED for live calls
         allow_interruptions=True,
         min_interruption_duration=0.3,
         user_away_timeout=8.0,

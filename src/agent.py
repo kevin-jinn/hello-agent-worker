@@ -18,6 +18,7 @@ logger = logging.getLogger("agent")
 
 load_dotenv(".env.local")
 
+
 class Assistant(Agent):
     def __init__(self):
         super().__init__(
@@ -27,8 +28,13 @@ class Assistant(Agent):
             )
         )
 
+
 def prewarm(proc: JobProcess):
-    proc.userdata["vad"] = silero.VAD.load()
+    proc.userdata["vad"] = silero.VAD.load(
+        min_speech_duration=0.2,
+        min_silence_duration=0.4,
+    )
+
 
 async def entrypoint(ctx: JobContext):
     await ctx.connect()
@@ -41,23 +47,24 @@ async def entrypoint(ctx: JobContext):
             voice_id="kiaJRdXJzloFWi6AtFBf",
         ),
         vad=ctx.proc.userdata["vad"],
-        preemptive_generation=False,  # IMPORTANT at start
+
+        allow_interruptions=True,
+        min_interruption_duration=0.3,
+        user_away_timeout=8.0,
+
+        preemptive_generation=False,
     )
 
     await session.start(agent=Assistant(), room=ctx.room)
 
-    # 🔑 WAIT FOR SIP PARTICIPANT
-    participant = await ctx.wait_for_participant()
+    await ctx.wait_for_participant()
 
-    # small delay to ensure RTP is flowing
-    await asyncio.sleep(0.5)
+    await asyncio.sleep(0.6)
 
-    # 🔊 NOW speak
     await session.say(
         "Hello! This is your virtual assistant. How can I help you today?"
     )
 
-    # enable natural back-and-forth AFTER greeting
     session.preemptive_generation = True
 
 

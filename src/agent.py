@@ -76,14 +76,9 @@ async def entrypoint(ctx: JobContext):
 
     # 🔍 Track subscription debug
     @ctx.room.on("track_subscribed")
-    def on_track_subscribed(
-        track: rtc.Track,
-        publication: rtc.TrackPublication,
-        participant: rtc.Participant,
-    ):
+    def on_track_subscribed(track, publication, participant):
         logger.info(
-            f"TRACK SUBSCRIBED | kind={track.kind} "
-            f"source={track.source} participant={participant.identity}"
+            f"Audio track subscribed from participant={participant.identity}, kind={track.kind}"
         )
 
     # --------------------------------------------------
@@ -111,7 +106,7 @@ async def entrypoint(ctx: JobContext):
     await session.start(agent=Assistant(), room=ctx.room)
 
     # 🔍 Wrap audio input to confirm RTP
-    session.input.audio = DebugAudioInput(session.input.audio)
+    # session.input.audio = DebugAudioInput(session.input.audio)
 
     logger.info("Waiting for participant...")
     await ctx.wait_for_participant()

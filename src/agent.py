@@ -96,7 +96,17 @@ async def entrypoint(ctx: JobContext):
     # Greeting
     # --------------------------------------------------
     await session.say(
-        "Hello! This is your virtual assistant. How can I help you today?"
+        """Hello! This is an automated call from Tata Motors Commercial Vehicles. We hope you are doing well today!
+
+We are contacting you to share exciting information about our new launch — Tata Ace Pro EV, India’s most affordable 4-wheeler electric vehicle, specially designed for smart and sustainable commercial needs.
+
+Let me tell you about its key features:
+
+The Tata Ace Pro EV is highly cost-saving (running cost of less than ₹1 per kilometer), reliable, comes with a 750 kg payload capacity, and offers an on-road range of 100 to 150 kilometers.
+
+Along with this, you also get Tata’s trust and service, as well as attractive finance and exchange offers.
+
+Would you like to receive more information about it, or schedule a demo and test drive with our team?"""
     )
 
     # 🔑 Enable back-and-forth conversation
